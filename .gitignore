@@ -1,0 +1,173 @@
+# Miscellaneous
+*.class
+*.log
+*.pyc
+*.swp
+.DS_Store
+.atom/
+.buildlog/
+.history
+.svn/
+migrate_working_dir/
+
+# IntelliJ related
+*.iml
+*.ipr
+*.iws
+.idea/
+
+# The .vscode folder contains launch configuration and tasks you configure in
+# VS Code which you may wish to be included in version control, so this line
+# is commented out by default.
+#.vscode/
+
+# Flutter/Dart/Pub related
+**/doc/api/
+**/ios/Flutter/.last_build_id
+.dart_tool/
+.flutter-plugins
+.flutter-plugins-dependencies
+.packages
+.pub-cache/
+.pub/
+/build/
+
+# Symbolication related
+app.*.symbols
+
+# Obfuscation related
+app.*.map.json
+
+# Android Studio will place build artifacts here
+/android/app/debug
+/android/app/profile
+/android/app/release
+
+# FVM Version Cache
+.fvm/
+
+
+# Flutter/Dart/Pub
+.dart_tool/
+.flutter-plugins
+.flutter-plugins-dependencies
+.packages
+.pub-cache/
+.pub/
+/build/
+pubspec.lock
+
+# iOS/macOS
+ios/.gitignore
+ios/**/*.mode1v3
+ios/**/*.mode2v3
+ios/**/*.moved-aside
+ios/**/*.pbxuser
+ios/**/*.perspectivev3
+ios/**/*sync/
+ios/**/.sconsign.dblite
+ios/**/.tags*
+ios/**/.clang-format
+ios/**/DerivedData/
+ios/**/Icon?
+ios/**/Icon?*
+ios/**/*lock.json
+ios/**/*manifest.json
+ios/**/*podspec.lock
+ios/.symlinks/
+ios/.dart_tool/
+ios/Flutter/Flutter.podspec
+ios/Flutter/Flutter.framework
+ios/Flutter/Flutter.modulemap
+ios/Flutter/GeneratedPluginRegistrant.*
+ios/Flutter/ephemeralmodules/
+ios/Flutter/app.flutterjs
+ios/Flutter/app.zip
+ios/Flutter/flutter_assets/
+ios/Flutter/flutter_export_environment.sh
+ios/Flutter/local.properties
+ios/Flutter/plugins.json
+
+# Android
+android/local.properties
+android/.gradle/
+android/captures/
+android/gradlew
+android/gradlew.bat
+android/gradle/
+android/.idea/
+android/**/*.iml
+android/**/local.properties
+android/.classpath
+android/.project
+android/.settings/
+android/.checkstyle
+android/lint.xml
+android/.gradle
+android/build/
+android/app/debug
+android/app/profile
+android/app/release
+android/.run
+android/gradle.properties
+# Web
+web/.dart_tool/
+web/.packages
+
+# Linux
+linux/flutter/generated_plugins.cmake
+linux/flutter/generated_plugin_registrant.cc
+linux/flutter/generated_plugin_registrant.h
+linux/flutter/generated_plugins_platform_interface.h
+linux/ephemeral/
+
+# Windows
+windows/flutter/generated_plugins.cmake
+windows/flutter/generated_plugin_registrant.cc
+windows/flutter/generated_plugin_registrant.h
+windows/flutter/generated_plugins_platform_interface.h
+windows/flutter/generated_app.rc
+
+# macOS
+macos/Flutter/GeneratedPluginRegistrant.swift
+macos/Flutter/Flutter-Debug.xcconfig
+macos/Flutter/Flutter-Release.xcconfig
+macos/Flutter/Flutter-Profile.xcconfig
+macos/Flutter/ephemeralmodules/
+macos/Podfile.lock
+
+# General
+*.iml
+*.class
+*.log
+*.pyc
+*.swp
+.DS_Store
+.env
+.env.*
+!.env.example
+
+# IDE
+.idea/
+*.swp
+*.swo
+*~
+.vscode/
+.vscode_test/
+*.code-workspace
+
+# OS
+Thumbs.db
+.DS_Store
+
+# Misc
+*.dill
+*.exe
+*.pdb
+
+# Coverage
+coverage/
+
+# Exceptions to above rules
+!/ios/Flutter/Flutter.podspec
+!/android/gradle/wrapper/gradle-wrapper.jar

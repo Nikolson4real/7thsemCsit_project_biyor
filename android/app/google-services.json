@@ -1,0 +1,54 @@
+{
+  "project_info": {
+    "project_number": "26578034581",
+    "project_id": "kubiyoar",
+    "storage_bucket": "kubiyoar.appspot.com"
+  },
+  "client": [
+    {
+      "client_info": {
+        "mobilesdk_app_id": "1:26578034581:android:191a5e948dbcf85efe609c",
+        "android_client_info": {
+          "package_name": "com.example.biyoar"
+        }
+      },
+      "oauth_client": [
+        {
+          "client_id": "26578034581-t95ckipirq3snje6ei46b1pun6cst60a.apps.googleusercontent.com",
+          "client_type": 1,
+          "android_info": {
+            "package_name": "com.example.biyoar",
+            "certificate_hash": "2c9ed34874aea8450f1370aba9b07ecdd5c6aab5"
+          }
+        },
+        {
+          "client_id": "26578034581-kigcvvt6k4jv5ue38nickibq395doh48.apps.googleusercontent.com",
+          "client_type": 3
+        }
+      ],
+      "api_key": [
+        {
+          "current_key": "AIzaSyBcEHj22sLud11LrBMJwJUUl8rPRh8O8vI"
+        }
+      ],
+      "services": {
+        "appinvite_service": {
+          "other_platform_oauth_client": [
+            {
+              "client_id": "26578034581-kigcvvt6k4jv5ue38nickibq395doh48.apps.googleusercontent.com",
+              "client_type": 3
+            },
+            {
+              "client_id": "26578034581-7neppj6h4nvudenhqppucqd7hknii2nk.apps.googleusercontent.com",
+              "client_type": 2,
+              "ios_info": {
+                "bundle_id": "com.example.biyoar.RunnerTests"
+              }
+            }
+          ]
+        }
+      }
+    }
+  ],
+  "configuration_version": "1"
+}
