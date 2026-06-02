@@ -1,0 +1,66 @@
+version: '3.8'
+
+services:
+  biyoR-backend:
+    build:
+      context: .
+      dockerfile: Dockerfile
+    container_name: biyoR-ai-backend
+    ports:
+      - "8000:8000"
+    environment:
+      # Google AI Studio Configuration
+      - GOOGLE_API_KEY=${GOOGLE_API_KEY}
+      
+      # Gemini Model Configuration
+      - GEMINI_PRIMARY_MODEL=${GEMINI_PRIMARY_MODEL:-gemini-2.5-flash}
+      - GEMINI_FALLBACK_MODEL=${GEMINI_FALLBACK_MODEL:-gemini-2.0-flash-exp}
+      - GOOGLE_EMBEDDINGS_MODEL=${GOOGLE_EMBEDDINGS_MODEL:-models/text-embedding-004}
+      
+      # FAISS and Document Configuration
+      - FAISS_INDEX_PATH=${FAISS_INDEX_PATH:-./data/faiss_index}
+      - RULEBOOKS_DIR=${RULEBOOKS_DIR:-./data/rulebooks}
+      
+      # RAG Pipeline Configuration
+      - RETRIEVAL_TOP_K=${RETRIEVAL_TOP_K:-5}
+      - CHUNK_SIZE=${CHUNK_SIZE:-600}
+      - CHUNK_OVERLAP=${CHUNK_OVERLAP:-100}
+      
+      # LLM Configuration
+      - LLM_TEMPERATURE=${LLM_TEMPERATURE:-0.1}
+      - LLM_MAX_OUTPUT_TOKENS=${LLM_MAX_OUTPUT_TOKENS:-2048}
+      - LLM_TIMEOUT_SECONDS=${LLM_TIMEOUT_SECONDS:-30}
+      
+      # API Configuration
+      - API_VERSION=${API_VERSION:-v1}
+      - LOG_LEVEL=${LOG_LEVEL:-INFO}
+    
+    volumes:
+      # Mount rulebooks directory
+      - ./data/rulebooks:/app/data/rulebooks:ro
+      
+      # Mount FAISS index directory (persistent)
+      - faiss_data:/app/data/faiss_index
+      
+      # Mount logs directory
+      - ./logs:/app/logs
+    
+    restart: unless-stopped
+    
+    healthcheck:
+      test: ["CMD", "python", "-c", "import requests; requests.get('http://localhost:8000/health', timeout=5)"]
+      interval: 30s
+      timeout: 10s
+      retries: 3
+      start_period: 40s
+    
+    networks:
+      - biyoR-network
+
+volumes:
+  faiss_data:
+    driver: local
+
+networks:
+  biyoR-network:
+    driver: bridge

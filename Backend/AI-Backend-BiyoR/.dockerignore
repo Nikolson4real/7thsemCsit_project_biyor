@@ -1,0 +1,54 @@
+# Ignore Python cache in Docker context
+__pycache__/
+*.py[cod]
+*$py.class
+*.so
+
+# Ignore virtual environments
+venv/
+env/
+ENV/
+.venv
+
+# Ignore local development files
+.env.local
+.vscode/
+.idea/
+*.swp
+*.swo
+
+# Ignore logs (will be mounted as volume)
+logs/
+*.log
+
+# Ignore FAISS index (will be built in container or mounted)
+data/faiss_index/
+
+# Ignore Git files
+.git/
+.gitignore
+.gitattributes
+
+# Ignore documentation (not needed in container)
+*.md
+!README.md
+
+# Ignore test files
+test_*.py
+*_test.py
+tests/
+.pytest_cache/
+
+# Ignore setup files
+setup.py
+.coverage
+htmlcov/
+
+# Ignore OS files
+.DS_Store
+Thumbs.db
+
+# Ignore Docker files themselves
+Dockerfile
+docker-compose*.yml
+.dockerignore
