@@ -46,6 +46,33 @@ class ChatApiResponse {
   }
 }
 
+/// ─────────────────────────────────────────────────────────────────────────
+/// Singleton that holds the chat session across navigations.
+/// As long as the app is alive, going Back and returning restores everything.
+/// ─────────────────────────────────────────────────────────────────────────
+class _ChatSession {
+  _ChatSession._();
+  static final _ChatSession instance = _ChatSession._();
+
+  /// Unique session ID shared with the backend LLM
+  final String sessionId = 'game_${DateTime.now().millisecondsSinceEpoch}';
+
+  /// All chat messages (user + bot)
+  final List<ChatMessage> messages = [];
+
+  /// Latest game state received from the API
+  Map<String, dynamic>? gameState;
+
+  /// Whether this is the very first time the screen is opened
+  bool get isNew => messages.isEmpty;
+
+  /// Clear everything and start fresh (used by the Restart button)
+  void reset() {
+    messages.clear();
+    gameState = null;
+  }
+}
+
 class BiyoRScoreCalculationLLM extends StatefulWidget {
   const BiyoRScoreCalculationLLM({super.key});
 
@@ -57,13 +84,11 @@ class BiyoRScoreCalculationLLM extends StatefulWidget {
 class _BiyoRScoreCalculationLLMState extends State<BiyoRScoreCalculationLLM> {
   final TextEditingController _messageController = TextEditingController();
   final ScrollController _scrollController = ScrollController();
-  final List<ChatMessage> _messages = [];
-  final String _sessionId = 'game_${DateTime.now().millisecondsSinceEpoch}';
+
+  // ── All persistent state lives in the singleton ──
+  final _ChatSession _session = _ChatSession.instance;
 
   bool _isLoading = false;
-
-  // Game state from API response
-  Map<String, dynamic>? _gameState;
 
   /// Remove emojis and special unicode characters from text
   String _stripEmojis(String text) {
@@ -124,8 +149,14 @@ class _BiyoRScoreCalculationLLMState extends State<BiyoRScoreCalculationLLM> {
   @override
   void initState() {
     super.initState();
-    // Start the conversation with an initial message
-    _sendMessage("Start the game");
+    // Only auto-start if this is a brand-new session (no messages yet).
+    // If the user pressed Back and came back, the existing conversation is shown.
+    if (_session.isNew) {
+      _sendMessage("Start the game");
+    } else {
+      // Scroll to bottom so the user sees the latest message
+      WidgetsBinding.instance.addPostFrameCallback((_) => _scrollToBottom());
+    }
   }
 
   @override
@@ -152,9 +183,9 @@ class _BiyoRScoreCalculationLLMState extends State<BiyoRScoreCalculationLLM> {
   Future<void> _sendMessage(String message) async {
     if (message.trim().isEmpty) return;
 
-    // Add user message to chat
+    // Add user message to the persistent session
     setState(() {
-      _messages.add(ChatMessage(text: message, isUser: true));
+      _session.messages.add(ChatMessage(text: message, isUser: true));
       _isLoading = true;
     });
     _scrollToBottom();
@@ -166,7 +197,7 @@ class _BiyoRScoreCalculationLLMState extends State<BiyoRScoreCalculationLLM> {
       // Use trailing slash to avoid 307 redirect
       var url = Uri.parse('http://192.168.1.64:8000/api/v1/chat/');
       final requestBody = jsonEncode({
-        'session_id': _sessionId,
+        'session_id': _session.sessionId,
         'message': message,
       });
 
@@ -194,20 +225,20 @@ class _BiyoRScoreCalculationLLMState extends State<BiyoRScoreCalculationLLM> {
         final apiResponse = ChatApiResponse.fromJson(jsonResponse);
 
         setState(() {
-          // Add bot response to chat (strip emojis)
-          _messages.add(ChatMessage(
+          // Add bot response to the persistent session (strip emojis)
+          _session.messages.add(ChatMessage(
               text: _stripEmojis(apiResponse.chatText), isUser: false));
 
-          // Update game state
+          // Update persistent game state
           if (apiResponse.state != null) {
-            _gameState = apiResponse.state;
+            _session.gameState = apiResponse.state;
           }
 
           _isLoading = false;
         });
       } else {
         setState(() {
-          _messages.add(ChatMessage(
+          _session.messages.add(ChatMessage(
             text:
                 'Error: Server returned ${response.statusCode}\n${response.body}',
             isUser: false,
@@ -217,7 +248,7 @@ class _BiyoRScoreCalculationLLMState extends State<BiyoRScoreCalculationLLM> {
       }
     } catch (e) {
       setState(() {
-        _messages.add(ChatMessage(
+        _session.messages.add(ChatMessage(
           text: 'Error: Could not connect to server.\n$e',
           isUser: false,
         ));
@@ -255,8 +286,9 @@ class _BiyoRScoreCalculationLLMState extends State<BiyoRScoreCalculationLLM> {
 
                 /// 🔹 SCROLLABLE CHAT CONTENT
                 Expanded(
-                  child:
-                      _messages.isEmpty ? _buildEmptyState() : _buildChatList(),
+                  child: _session.messages.isEmpty
+                      ? _buildEmptyState()
+                      : _buildChatList(),
                 ),
 
                 /// 🔹 INPUT FIELD
@@ -294,10 +326,10 @@ class _BiyoRScoreCalculationLLMState extends State<BiyoRScoreCalculationLLM> {
                     fontWeight: FontWeight.bold,
                   ),
                 ),
-                if (_gameState != null) ...[
+                if (_session.gameState != null) ...[
                   const SizedBox(height: 2),
                   Text(
-                    'Team: ${_gameState!['team'] ?? 'N/A'} | Score: ${_gameState!['total_score'] ?? 0} | Time: ${_gameState!['time_left']?.toStringAsFixed(0) ?? '30'} min',
+                    'Team: ${_session.gameState!['team'] ?? 'N/A'} | Score: ${_session.gameState!['total_score'] ?? 0} | Time: ${_session.gameState!['time_left']?.toStringAsFixed(0) ?? '30'} min',
                     style: TextStyle(
                       color: Colors.white.withOpacity(0.8),
                       fontSize: 12,
@@ -307,12 +339,11 @@ class _BiyoRScoreCalculationLLMState extends State<BiyoRScoreCalculationLLM> {
               ],
             ),
           ),
-          // Restart button
+          // Restart button — clears the session and starts fresh
           IconButton(
             onPressed: () {
               setState(() {
-                _messages.clear();
-                _gameState = null;
+                _session.reset();
               });
               _sendMessage("Restart");
             },
@@ -340,14 +371,14 @@ class _BiyoRScoreCalculationLLMState extends State<BiyoRScoreCalculationLLM> {
     return ListView.builder(
       controller: _scrollController,
       padding: const EdgeInsets.symmetric(horizontal: 10, vertical: 10),
-      itemCount: _messages.length + (_isLoading ? 1 : 0),
+      itemCount: _session.messages.length + (_isLoading ? 1 : 0),
       itemBuilder: (context, index) {
         // Show loading indicator at the end
-        if (index == _messages.length && _isLoading) {
+        if (index == _session.messages.length && _isLoading) {
           return _buildLoadingBubble();
         }
 
-        final message = _messages[index];
+        final message = _session.messages[index];
         return _buildMessageBubble(message);
       },
     );
@@ -440,15 +471,13 @@ class _BiyoRScoreCalculationLLMState extends State<BiyoRScoreCalculationLLM> {
         top: 10,
         bottom: MediaQuery.of(context).padding.bottom + 10,
       ),
-      decoration: BoxDecoration(
-          // color: Colors.black.withOpacity(0.3),
-          ),
+      decoration: const BoxDecoration(),
       child: Row(
         children: [
           Expanded(
             child: TextFormField(
               controller: _messageController,
-              style: TextStyle(color: Colors.black87),
+              style: const TextStyle(color: Colors.black87),
               decoration: InputDecoration(
                 hintText: "Type your message...",
                 hintStyle: TextStyle(color: Colors.grey[600]),
@@ -479,7 +508,7 @@ class _BiyoRScoreCalculationLLMState extends State<BiyoRScoreCalculationLLM> {
           const SizedBox(width: 8),
           // Send button
           Container(
-            decoration: BoxDecoration(
+            decoration: const BoxDecoration(
               color: borderColor,
               shape: BoxShape.circle,
             ),
