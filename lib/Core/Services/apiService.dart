@@ -2,8 +2,8 @@ import 'dart:convert';
 import 'package:http/http.dart' as http;
 
 class ApiClient {
-  static const String _baseUrl =
-      "http://localhost:8000/api/v1/docs";
+  // static const String _baseUrl = "http://192.168.18.88:8000/api/v1";
+  static const String _baseUrl = "http://192.168.1.64:8000/api/v1";
 
   Future<Map<String, dynamic>> fetchRules({
     required int biyoLength,

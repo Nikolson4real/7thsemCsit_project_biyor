@@ -164,7 +164,7 @@ class _BiyoRScoreCalculationLLMState extends State<BiyoRScoreCalculationLLM> {
 
     try {
       // Use trailing slash to avoid 307 redirect
-      var url = Uri.parse('http://136.112.79.163:8000/api/v1/chat/');
+      var url = Uri.parse('http://192.168.1.64:8000/api/v1/chat/');
       final requestBody = jsonEncode({
         'session_id': _sessionId,
         'message': message,
