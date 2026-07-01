@@ -9,7 +9,7 @@ import 'package:biyoar/test/ChickenObject.dart';
 import 'package:biyoar/test/woodenChickenObject.dart';
 import 'package:flutter/material.dart';
 import 'dart:async';
-import 'examples/screenshotexample.dart';
+
 import 'package:flutter/services.dart';
 import 'package:ar_flutter_plugin/ar_flutter_plugin.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';

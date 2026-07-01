@@ -9,11 +9,12 @@ import 'package:biyoar/Core/Customs/customColors.dart';
 import 'package:biyoar/Presentation/Features/Pages/llmform.dart';
 
 import 'package:flutter/material.dart';
-import 'package:ar_flutter_plugin/ar_flutter_plugin.dart';
+import 'package:ar_flutter_plugin/ar_flutter_plugin.dart' hide Colors;
 import 'package:ar_flutter_plugin/datatypes/config_planedetection.dart';
 import 'package:ar_flutter_plugin/datatypes/node_types.dart';
 import 'package:ar_flutter_plugin/models/ar_node.dart';
 import 'package:vector_math/vector_math_64.dart' as vm;
+import 'package:permission_handler/permission_handler.dart';
 
 /// Small container to tie a node with its anchor (so we can remove either later)
 class PlacedItem {
@@ -53,6 +54,29 @@ class WoodenChickenObjectWidgetState extends State<WoodenChickenObjectWidget> {
   bool showForm = false; // form visible or not
   bool arEnabled = false; // AR interaction enabled
   bool isLoading = false; // loading spinner after submit
+  bool _cameraPermissionGranted = false;
+
+  @override
+  void initState() {
+    super.initState();
+    _checkAndRequestCameraPermission();
+  }
+
+  Future<void> _checkAndRequestCameraPermission() async {
+    var status = await Permission.camera.status;
+    if (!status.isGranted) {
+      status = await Permission.camera.request();
+    }
+    if (status.isGranted) {
+      setState(() {
+        _cameraPermissionGranted = true;
+      });
+    } else {
+      if (status.isPermanentlyDenied) {
+        openAppSettings();
+      }
+    }
+  }
 
   @override
   void dispose() {
@@ -66,10 +90,34 @@ class WoodenChickenObjectWidgetState extends State<WoodenChickenObjectWidget> {
       backgroundColor: blackColor,
       body: Stack(
         children: [
-          ARView(
-            onARViewCreated: onARViewCreated,
-            planeDetectionConfig: PlaneDetectionConfig.horizontal,
-          ),
+          if (_cameraPermissionGranted)
+            ARView(
+              onARViewCreated: onARViewCreated,
+              planeDetectionConfig: PlaneDetectionConfig.horizontal,
+            )
+          else
+            Center(
+              child: Column(
+                mainAxisAlignment: MainAxisAlignment.center,
+                children: [
+                  const Icon(Icons.camera_alt, color: Colors.white, size: 60),
+                  const SizedBox(height: 16),
+                  const Text(
+                    "Camera permission is required for AR",
+                    style: TextStyle(color: Colors.white, fontSize: 18),
+                  ),
+                  const SizedBox(height: 24),
+                  ElevatedButton(
+                    onPressed: _checkAndRequestCameraPermission,
+                    style: ElevatedButton.styleFrom(
+                      backgroundColor: woodBrown,
+                      foregroundColor: Colors.white,
+                    ),
+                    child: const Text("Grant Permission"),
+                  ),
+                ],
+              ),
+            ),
           Positioned(
             top: 30, // adjust if needed
             left: 20,

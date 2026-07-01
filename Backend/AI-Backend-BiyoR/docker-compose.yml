@@ -1,11 +1,11 @@
-version: '3.8'
-
 services:
-  biyoR-backend:
+  biyor-backend: # Renamed service to lowercase to be safe
     build:
       context: .
       dockerfile: Dockerfile
-    container_name: biyoR-ai-backend
+    container_name: biyor-ai-backend # Changed to lowercase
+    # Explicitly define image name in lowercase to avoid ambiguity based on folder name
+    image: biyor-ai-backend-image 
     ports:
       - "8000:8000"
     environment:
@@ -36,31 +36,28 @@ services:
       - LOG_LEVEL=${LOG_LEVEL:-INFO}
     
     volumes:
-      # Mount rulebooks directory
       - ./data/rulebooks:/app/data/rulebooks:ro
-      
-      # Mount FAISS index directory (persistent)
       - faiss_data:/app/data/faiss_index
-      
-      # Mount logs directory
       - ./logs:/app/logs
     
     restart: unless-stopped
     
     healthcheck:
-      test: ["CMD", "python", "-c", "import requests; requests.get('http://localhost:8000/health', timeout=5)"]
+      # Using wget or curl is often more reliable if installed, otherwise python is fine.
+      # Ensure the URL matches the port exposed inside the container (8000).
+      test: ["CMD", "python", "-c", "import urllib.request; urllib.request.urlopen('http://localhost:8000/health')"]
       interval: 30s
       timeout: 10s
       retries: 3
       start_period: 40s
     
     networks:
-      - biyoR-network
+      - biyor-network # Renamed network to lowercase
 
 volumes:
   faiss_data:
     driver: local
 
 networks:
-  biyoR-network:
+  biyor-network:
     driver: bridge

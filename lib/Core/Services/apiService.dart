@@ -3,7 +3,7 @@ import 'package:http/http.dart' as http;
 
 class ApiClient {
   static const String _baseUrl =
-      "http://136.112.79.163:8000/api/v1/game/initial_rule_modified";
+      "http://localhost:8000/api/v1/docs";
 
   Future<Map<String, dynamic>> fetchRules({
     required int biyoLength,
